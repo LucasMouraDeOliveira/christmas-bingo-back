@@ -3,6 +3,7 @@ package com.lordkadoc.bingo_back.bingo_grid;
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoGrid;
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoTask;
 import com.lordkadoc.bingo_back.bingo_grid.infrastructure.BingoGridRepository;
+import com.lordkadoc.bingo_back.tasks.Task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,12 +27,13 @@ class BingoGridRepositoryTest {
         BingoGrid bingoGrid = new BingoGrid();
         bingoGrid.setPlayerId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
-        BingoTask task1 = new BingoTask();
-        task1.setTitle("Buy gifts");
-        task1.setDescription("Prepare presents");
-        task1.setPoints(10);
-        task1.setCompleted(false);
-        bingoGrid.setTasks(List.of(task1));
+        BingoTask bingoTask = new BingoTask();
+        Task task = new Task();
+        task.setTitle("Buy gifts");
+        task.setDescription("Prepare presents");
+        task.setPoints(10);
+        bingoTask.setCompleted(false);
+        bingoGrid.setTasks(List.of(bingoTask));
 
         BingoGrid saved = bingoGridRepository.saveAndFlush(bingoGrid);
 
@@ -39,6 +41,6 @@ class BingoGridRepositoryTest {
 
         assertThat(loaded.getPlayerId()).isEqualTo(bingoGrid.getPlayerId());
         assertThat(loaded.getTasks()).hasSize(1);
-        assertThat(loaded.getTasks().get(0).getTitle()).isEqualTo("Buy gifts");
+        assertThat(loaded.getTasks().get(0).getTask().getTitle()).isEqualTo("Buy gifts");
     }
 }

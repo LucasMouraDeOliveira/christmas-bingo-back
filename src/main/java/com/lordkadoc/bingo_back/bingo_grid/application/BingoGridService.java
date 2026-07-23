@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoGrid;
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoTask;
 import com.lordkadoc.bingo_back.bingo_grid.infrastructure.BingoGridRepository;
+import com.lordkadoc.bingo_back.tasks.Task;
+import com.lordkadoc.bingo_back.tasks.TaskService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,28 +20,37 @@ import lombok.RequiredArgsConstructor;
 public class BingoGridService {
 
     private final BingoGridRepository bingoGridRepository;
-    private final BingoTaskSelectionService bingoTaskSelectionService;
+    private final TaskService taskService;
 
     @Transactional
     public Optional<BingoGridDTO> getBingoGridForPlayer(UUID playerId) {
-        return bingoGridRepository.findLastByPlayerId(playerId).map(this::toDto);
+        return bingoGridRepository.findLastByPlayerId(playerId).map(this::toDTO);
     }
 
+    @Transactional
     public BingoGridDTO createBingoGridForPlayer(UUID playerId) {
-        List<BingoTask> selectedTasks = bingoTaskSelectionService.selectRandomTasks();
+        List<BingoTask> selectedTasks = taskService.selectRandomTasks()
+                .stream()
+                .map(t -> new BingoTask(null, t, false))
+                .toList();
         BingoGrid bingoGrid = new BingoGrid();
         bingoGrid.setPlayerId(playerId);
         bingoGrid.setTasks(selectedTasks);
         bingoGridRepository.save(bingoGrid);
 
-        return toDto(bingoGrid);
+        return toDTO(bingoGrid);
     }
 
-    private BingoGridDTO toDto(BingoGrid bingoGrid) {
+    private BingoGridDTO toDTO(BingoGrid bingoGrid) {
         List<BingoTaskDTO> taskDtos = bingoGrid.getTasks().stream()
-                .map(task -> new BingoTaskDTO(task.getTitle(), task.getDescription(), task.getPoints(), task.isCompleted()))
+                .map(this::toDTO)
                 .toList();
         return new BingoGridDTO(taskDtos);
+    }
+
+    private BingoTaskDTO toDTO(BingoTask bingoTask) {
+        Task task = bingoTask.getTask();
+        return new BingoTaskDTO(task.getTitle(), task.getDescription(), task.getPoints(), bingoTask.isCompleted());
     }
 
     @Transactional

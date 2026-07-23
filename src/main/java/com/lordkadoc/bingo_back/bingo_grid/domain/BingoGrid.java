@@ -13,16 +13,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "bingo_grids")
 @Getter
 @Setter
-@NoArgsConstructor
 public class BingoGrid {
 
     @Id
@@ -37,5 +36,6 @@ public class BingoGrid {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "bingo_grid_id")
+    @OrderBy("id")
     private List<BingoTask> tasks = new ArrayList<>();
 }
