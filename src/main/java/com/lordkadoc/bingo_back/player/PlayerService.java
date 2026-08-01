@@ -18,20 +18,20 @@ public class PlayerService {
 
     public List<PlayerDTO> listPlayers() {
         return playerRepository.findAll().stream()
-                .map(player -> new PlayerDTO(player.getId(), player.getName()))
+                .map(this::toDTO)
                 .toList();
     }
 
     public PlayerDTO findPlayerById(UUID playerId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found"));
-        return new PlayerDTO(player.getId(), player.getName());
+        return toDTO(player);
     }
 
     public PlayerDTO findPlayerByName(String playerName) {
         Player player = playerRepository.findByName(playerName)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found"));
-        return new PlayerDTO(player.getId(), player.getName());
+        return toDTO(player);
     }
 
     public PlayerDTO createPlayer(String name, String password) {
@@ -43,6 +43,10 @@ public class PlayerService {
         player.setName(name);
         player.setPassword(passwordEncoder.encode(password));
         player = playerRepository.save(player);
+        return toDTO(player);
+    }
+
+    public PlayerDTO toDTO(Player player) {
         return new PlayerDTO(player.getId(), player.getName());
     }
 }

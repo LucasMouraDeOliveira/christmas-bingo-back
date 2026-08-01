@@ -1,5 +1,7 @@
 package com.lordkadoc.bingo_back.bingo_grid.presentation;
 
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,19 +20,26 @@ public interface BingoGridAPI {
 
         @GetMapping("bingo-grid")
         @Operation(summary = "Get bingo grid", description = "Retrieve the bingo grid belonging to the authentified player")
-        BingoGridDTO getBingoGrid(Authentication auth);
+        BingoGridDTO getBingoGrid(
+                @PathVariable UUID partyId,        
+                Authentication auth
+        );
 
         @PostMapping("bingo-grid")
         @Operation(summary = "Create bingo grid", description = "Create a new random 3x3 bingo grid for the authentified player")
         @ApiResponse(responseCode = "200", description = "Bingo grid created successfully")
-        BingoGridDTO createBingoGrid(Authentication auth);
+        BingoGridDTO createBingoGrid(
+                @PathVariable UUID partyId,
+                Authentication auth
+        );
 
         @PostMapping("bingo-grid/tasks/{taskIndex}")
         @Operation(summary = "Update task completion", description = "Update the completion status of a task in the player's bingo grid.")
         @ApiResponse(responseCode = "200", description = "Task completion status updated successfully")
         void updateTaskCompletion(
-                        Authentication auth,
-                        @Parameter(description = "Index of the task in the bingo grid", required = true) @PathVariable int taskIndex,
-                        @Parameter(description = "New completion status of the task", required = true) @RequestBody TaskCompletionRequest request);
+                @PathVariable UUID partyId,
+                Authentication auth,
+                @Parameter(description = "Index of the task in the bingo grid", required = true) @PathVariable int taskIndex,
+                @Parameter(description = "New completion status of the task", required = true) @RequestBody TaskCompletionRequest request);
 
 }

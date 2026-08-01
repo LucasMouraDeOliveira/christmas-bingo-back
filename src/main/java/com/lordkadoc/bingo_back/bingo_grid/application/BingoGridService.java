@@ -2,13 +2,14 @@ package com.lordkadoc.bingo_back.bingo_grid.application;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoGrid;
 import com.lordkadoc.bingo_back.bingo_grid.domain.BingoTask;
 import com.lordkadoc.bingo_back.bingo_grid.infrastructure.BingoGridRepository;
+import com.lordkadoc.bingo_back.party.Party;
+import com.lordkadoc.bingo_back.player.Player;
 import com.lordkadoc.bingo_back.tasks.Task;
 import com.lordkadoc.bingo_back.tasks.TaskService;
 
@@ -20,21 +21,23 @@ import lombok.RequiredArgsConstructor;
 public class BingoGridService {
 
     private final BingoGridRepository bingoGridRepository;
+
     private final TaskService taskService;
 
     @Transactional
-    public Optional<BingoGridDTO> getBingoGridForPlayer(UUID playerId) {
-        return bingoGridRepository.findLastByPlayerId(playerId).map(this::toDTO);
+    public Optional<BingoGridDTO> getBingoGrid(Party party, Player player) {
+        return bingoGridRepository.findLastByPartyAndPlayer(party, player).map(this::toDTO);
     }
 
     @Transactional
-    public BingoGridDTO createBingoGridForPlayer(UUID playerId) {
+    public BingoGridDTO createBingoGridForPlayer(Party party, Player player) {
         List<BingoTask> selectedTasks = taskService.selectRandomTasks()
                 .stream()
                 .map(t -> new BingoTask(null, t, false))
                 .toList();
         BingoGrid bingoGrid = new BingoGrid();
-        bingoGrid.setPlayerId(playerId);
+        bingoGrid.setParty(party);
+        bingoGrid.setPlayer(player);
         bingoGrid.setTasks(selectedTasks);
         bingoGridRepository.save(bingoGrid);
 
@@ -42,10 +45,10 @@ public class BingoGridService {
     }
 
     private BingoGridDTO toDTO(BingoGrid bingoGrid) {
-        List<BingoTaskDTO> taskDtos = bingoGrid.getTasks().stream()
+        List<BingoTaskDTO> taskDTOs = bingoGrid.getTasks().stream()
                 .map(this::toDTO)
                 .toList();
-        return new BingoGridDTO(taskDtos);
+        return new BingoGridDTO(bingoGrid.getParty().getId(), bingoGrid.getPlayer().getId(), taskDTOs);
     }
 
     private BingoTaskDTO toDTO(BingoTask bingoTask) {
@@ -54,12 +57,13 @@ public class BingoGridService {
     }
 
     @Transactional
-    public void updateTaskCompletion(UUID playerId, int taskIndex, boolean completed) {
-        BingoGrid bingoGrid = bingoGridRepository.findLastByPlayerId(playerId).orElseThrow();
+    public void updateTaskCompletion(Party party, Player player, int taskIndex, boolean completed) {
+        BingoGrid bingoGrid = bingoGridRepository.findLastByPartyAndPlayer(party, player).orElseThrow();
         List<BingoTask> tasks = bingoGrid.getTasks();
         if (taskIndex >= 0 && taskIndex < tasks.size()) {
             tasks.get(taskIndex).setCompleted(completed);
             bingoGridRepository.save(bingoGrid);
         }
     }
+
 }

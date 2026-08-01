@@ -27,3 +27,6 @@ replay_pid*
 
 # IDE
 .vscode
+
+# Custom
+data-dev.sql
