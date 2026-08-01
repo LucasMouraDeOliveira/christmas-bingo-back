@@ -46,5 +46,7 @@ public class Party {
     private List<Player> players = new ArrayList<>();
 
     private int maxPlayers;
+
+    private int gridSize;
     
 }

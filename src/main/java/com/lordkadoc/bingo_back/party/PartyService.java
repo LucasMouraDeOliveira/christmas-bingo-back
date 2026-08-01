@@ -36,7 +36,7 @@ public class PartyService {
     }
 
     @Transactional
-    public PartyDTO createParty(String organizerName, String partyName, int maxPlayers) {
+    public PartyDTO createParty(String organizerName, String partyName, int maxPlayers, int gridSize) {
         Player player = this.playerRepository.findByName(organizerName).orElseThrow();
 
         Party party = new Party();
@@ -44,6 +44,7 @@ public class PartyService {
         party.setName(partyName);
         party.setCreatedAt(Instant.now());
         party.setMaxPlayers(maxPlayers);
+        party.setGridSize(gridSize);
         party.getPlayers().add(player);
 
         party = partyRepository.save(party);
@@ -73,7 +74,9 @@ public class PartyService {
             party.getCreatedAt(),
             playerService.toDTO(party.getOrganizer()), 
             party.getPlayers().stream().map(playerService::toDTO).toList(), 
-            party.getMaxPlayers());
+            party.getMaxPlayers(),
+            party.getGridSize()
+        );
     }
     
 }

@@ -31,7 +31,7 @@ public class BingoGridService {
 
     @Transactional
     public BingoGridDTO createBingoGridForPlayer(Party party, Player player) {
-        List<BingoTask> selectedTasks = taskService.selectRandomTasks()
+        List<BingoTask> selectedTasks = taskService.selectRandomTasks(party.getGridSize())
                 .stream()
                 .map(t -> new BingoTask(null, t, false))
                 .toList();

@@ -17,10 +17,10 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
 
-    public List<Task> selectRandomTasks() {
+    public List<Task> selectRandomTasks(int gridSize) {
         List<Task> tasks = taskRepository.findAll();
         Collections.shuffle(tasks, random);
-        return new ArrayList<>(tasks.subList(0, Math.min(9, tasks.size())));
+        return new ArrayList<>(tasks.subList(0, Math.min(gridSize*gridSize, tasks.size())));
     }
     
 }

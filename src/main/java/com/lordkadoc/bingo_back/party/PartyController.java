@@ -16,7 +16,6 @@ import com.lordkadoc.bingo_back.player.PlayerRepository;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController
 @RequestMapping("parties")
 @RequiredArgsConstructor
@@ -28,7 +27,8 @@ public class PartyController {
 
     @PostMapping
     public PartyDTO createParty(Authentication auth, @RequestBody CreatePartyDTO createPartyDTO) {
-        return partyService.createParty(auth.getName(), createPartyDTO.name(), createPartyDTO.maxPlayers());
+        return partyService.createParty(auth.getName(), createPartyDTO.name(), createPartyDTO.maxPlayers(),
+                createPartyDTO.gridSize());
     }
 
     @GetMapping
