@@ -27,8 +27,7 @@ public class PartyController {
 
     @PostMapping
     public PartyDTO createParty(Authentication auth, @RequestBody CreatePartyDTO createPartyDTO) {
-        return partyService.createParty(auth.getName(), createPartyDTO.name(), createPartyDTO.maxPlayers(),
-                createPartyDTO.gridSize());
+        return partyService.createParty(auth.getName(), createPartyDTO);
     }
 
     @GetMapping

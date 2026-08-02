@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.lordkadoc.bingo_back.player.Player;
 import com.lordkadoc.bingo_back.player.PlayerRepository;
 import com.lordkadoc.bingo_back.player.PlayerService;
+import com.lordkadoc.bingo_back.tasks.TaskService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ public class PartyService {
     private final PartyRepository partyRepository;
 
     private final PlayerService playerService;
+
+    private final TaskService taskService;
 
     private final PlayerRepository playerRepository;
 
@@ -36,18 +39,21 @@ public class PartyService {
     }
 
     @Transactional
-    public PartyDTO createParty(String organizerName, String partyName, int maxPlayers, int gridSize) {
+    public PartyDTO createParty(String organizerName, CreatePartyDTO createPartyDTO) {
         Player player = this.playerRepository.findByName(organizerName).orElseThrow();
 
         Party party = new Party();
         party.setOrganizer(player);
-        party.setName(partyName);
+        party.setName(createPartyDTO.name());
         party.setCreatedAt(Instant.now());
-        party.setMaxPlayers(maxPlayers);
-        party.setGridSize(gridSize);
+        party.setMaxPlayers(createPartyDTO.maxPlayers());
+        party.setGridSize(createPartyDTO.gridSize());
+        party.setIncludeDefaultTasks(createPartyDTO.includeDefaultTasks());
         party.getPlayers().add(player);
 
         party = partyRepository.save(party);
+
+        taskService.createTasks(createPartyDTO.tasks(), party);
 
         return toDTO(party);
     }

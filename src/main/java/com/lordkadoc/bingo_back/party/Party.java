@@ -48,5 +48,7 @@ public class Party {
     private int maxPlayers;
 
     private int gridSize;
+
+    private boolean includeDefaultTasks;
     
 }
