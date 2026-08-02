@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,31 +43,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token =
             authHeader.substring(7);
 
-        String username =
-            jwtService.extractUsername(token);
+        try {
+            String username =
+                jwtService.extractUsername(token);
 
-        if (username != null &&
-            SecurityContextHolder
-                .getContext()
-                .getAuthentication() == null) {
-
-            UserDetails user =
-                userDetailsService
-                    .loadUserByUsername(username);
-
-            if (jwtService.isValid(token, user)) {
-
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        user.getAuthorities()
-                    );
-
+            if (username != null &&
                 SecurityContextHolder
                     .getContext()
-                    .setAuthentication(authentication);
+                    .getAuthentication() == null) {
+
+                UserDetails user =
+                    userDetailsService
+                        .loadUserByUsername(username);
+
+                if (jwtService.isValid(token, user)) {
+
+                    UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                        );
+
+                    SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
+                }
             }
+        } catch (JwtException ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"code\": \"INVALID_TOKEN\", \"message\":\"Invalid or expired JWT token\"}");
+            return;
         }
 
         filterChain.doFilter(request, response);
