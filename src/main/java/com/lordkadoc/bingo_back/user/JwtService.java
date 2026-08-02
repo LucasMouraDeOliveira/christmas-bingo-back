@@ -23,7 +23,7 @@ public class JwtService {
         return Jwts.builder()
             .subject(user.getUsername())
             .issuedAt(new Date())
-            .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+            .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
             .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()))
             .compact();
     }
