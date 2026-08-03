@@ -22,6 +22,12 @@ public class PlayerService {
                 .toList();
     }
 
+    public List<PlayerDTO> searchPlayers(String nameLike) {
+        return playerRepository.findAllByNameContaining(nameLike).stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
     public PlayerDTO findPlayerById(UUID playerId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found"));

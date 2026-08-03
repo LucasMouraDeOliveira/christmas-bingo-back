@@ -1,3 +1,5 @@
 package com.lordkadoc.bingo_back.party;
 
-public record AddPlayerDTO(String name) {}
+import java.util.UUID;
+
+public record AddPlayerDTO(UUID playerId) {}

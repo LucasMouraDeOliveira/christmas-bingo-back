@@ -44,7 +44,7 @@ public class PartyController {
     @PostMapping("{partyId}/players")
     public PartyDTO addPlayerToParty(@PathVariable UUID partyId, @RequestBody AddPlayerDTO addPlayerDTO) {
         // TODO check that the authenticated player is the owner of the party
-        Player player = playerRepository.findByName(addPlayerDTO.name()).orElseThrow();
+        Player player = playerRepository.findById(addPlayerDTO.playerId()).orElseThrow();
         return partyService.addPlayerToParty(partyId, player);
     }
 

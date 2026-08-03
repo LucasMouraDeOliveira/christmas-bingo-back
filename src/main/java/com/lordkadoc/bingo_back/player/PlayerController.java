@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -14,8 +15,12 @@ public class PlayerController implements PlayerAPI {
     private final PlayerService playerService;
 
     @Override
-    public List<PlayerDTO> listPlayers() {
-        return this.playerService.listPlayers();
+    public List<PlayerDTO> listPlayers(String name) {
+        if(StringUtils.isBlank(name)) {
+            return this.playerService.listPlayers();
+        } else {
+            return this.playerService.searchPlayers(name);
+        }
     }
 
     @Override
